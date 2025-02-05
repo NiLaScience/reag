@@ -206,35 +206,39 @@ class ReagClient:
                     message_content = response.choices[0].message.content
 
                     try:
-                        # Ensure it's parsed as a dict
-                        data = (
-                            json.loads(message_content)
-                            if isinstance(message_content, str)
-                            else message_content
-                        )
-
-                        if data["source"].get("is_irrelevant", True):
-                            continue
-
-                        results.append(
-                            QueryResult(
-                                content=data["source"].get("content", ""),
-                                reasoning=data["source"].get("reasoning", ""),
-                                is_irrelevant=data["source"].get("is_irrelevant", False),
-                                document=document,
+                        if self.model.startswith("ollama/"):
+                            content, reasoning, is_irrelevant = self._extract_think_content(message_content)
+                            results.append(
+                                QueryResult(
+                                    content=content,
+                                    reasoning=reasoning,
+                                    is_irrelevant=is_irrelevant,
+                                    document=document,
+                                )
                             )
-                        )
+                        else:
+                            # Ensure it's parsed as a dict
+                            data = (
+                                json.loads(message_content)
+                                if isinstance(message_content, str)
+                                else message_content
+                            )
+
+                            if data["source"].get("is_irrelevant", True):
+                                continue
+
+                            results.append(
+                                QueryResult(
+                                    content=data["source"].get("content", ""),
+                                    reasoning=data["source"].get("reasoning", ""),
+                                    is_irrelevant=data["source"].get("is_irrelevant", False),
+                                    document=document,
+                                )
+                            )
                     except json.JSONDecodeError:
-                        content, reasoning, is_irrelevant = self._extract_think_content(message_content)
-                        results.append(
-                            QueryResult(
-                                content=content,
-                                reasoning=reasoning,
-                                is_irrelevant=is_irrelevant,
-                                document=document,
-                            )
-                        )
+                        print("Error: Could not parse response:", message_content)
                         continue
+
             return results
 
         except Exception as e:
