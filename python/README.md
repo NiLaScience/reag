@@ -14,8 +14,9 @@
 from reag.client import ReagClient, Document
 
 async with ReagClient(
-      model="ollama/deepseek-r1:14b",
-      api_base="http://localhost:11434") as client:
+      model="ollama/deepseek-r1:7b",
+      model_kwargs={"api_base": "http://localhost:11434"}
+   ) as client:
         docs = [
             Document(
                 name="Superagent",
