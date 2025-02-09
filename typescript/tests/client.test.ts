@@ -30,6 +30,7 @@ describe("typescript client", () => {
           },
         },
       ]);
+      console.log(result);
 
       expect(result).toBeInstanceOf(Array);
       expect(result[0]).toHaveProperty("content");
