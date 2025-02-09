@@ -42,13 +42,13 @@ class ReagClient:
         system: str = None,
         batch_size: int = DEFAULT_BATCH_SIZE,
         schema: Optional[BaseModel] = None,
-        api_base: Optional[str] = None,  # Added for Ollama support
+        model_kwargs: Optional[Dict] = None,
     ):
         self.model = model
         self.system = system or REAG_SYSTEM_PROMPT
         self.batch_size = batch_size
         self.schema = schema or ResponseSchemaMessage
-        self.api_base = api_base  # New attribute for API base URL
+        self.model_kwargs = model_kwargs or {}
         self._http_client = None
 
     async def __aenter__(self):
@@ -195,6 +195,7 @@ class ReagClient:
                                 {"role": "user", "content": prompt},
                             ],
                             response_format=self.schema,
+                            **self.model_kwargs,
                         )
                     )
 
